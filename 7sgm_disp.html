@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ja">
+	<head>
+		<meta charset="UTF-8">
+		<title>LTspiceでの7セグメントLED表示器</title>
+		<style>
+		body{
+		background-color: rgba(0, 0, 0, 0.8);
+		}
+		.container {
+		    max-width: 1000px; 
+            margin: 0 auto; 
+            padding: 40px; 
+            background-color: rgba(0.5, 0.3, 0.1, 0.6); 
+		}
+        .code-container {
+            overflow-x: auto; /* Add horizontal scrolling */
+            white-space: nowrap; /* Prevent wrapping */
+            background-color: #222; /* Optional: change background for visibility */
+            padding: 10px; /* Optional: add padding */
+            border-radius: 5px; /* Optional: round corners */
+        }
+        pre {
+            margin: 0; /* Remove margin */
+            color: white; /* Change text color */
+        }		
+  .custom-hr {
+    border: none;          /* Remove default border */
+    height: 2px;          /* Set height */
+    background-color: #ccc; /* Set color */
+    margin: 20px 0;       /* Set margin for spacing */
+  }
+  
+.last-edited {
+    color: rgba(136, 136, 136, 0.7); /* Faded color */
+    font-size: 0.9em; /* Make it slightly smaller */
+    margin-top: 10px; /* Add some space above */
+    text-align: right; /* Align text to the left */
+    display: block; /* Ensure it behaves as a block element */
+}  
+		</style>
+	</head>
+	
+	<body>
+		<font color="white">
+	<div class ="container">
+		<center>
+		<h1>LTspiceでの7セグメントLED表示器（１桁、4桁）の設計</h1>
+		</center>
+ <p class="last-edited">投稿日: 2024年10月13日</p>
+ <p class="last-edited">最終更新日: 2024年10月13日</p>
+		<p>
+		
+		<strong>問題：</strong>
+		LTspiceを使用してあるプロジェクトの回路を設計したい。しかし、その回路は4桁の7セグメントLEDディスプレイを使用するのが、ネット上でそのモデルがなかなか見つからない。
+		</p>
+		<hr class="custom-hr">
+		
+		<p>
+		<strong>解決策：</strong>
+		LTspiceで7セグメントLEDディスプレイのモデルを自分で作る。
+		
+		
+		
+		
+		</p>
+		<hr class="custom-hr">
+
+		<p>
+		<strong>結果：</strong>
+		7セグメント表示器には、コモン・カソード表示器とコモン・アノード表示器の2種類があることがわかった。
+		この2つのディスプレイの違いは、コモンカソードは7セグメントのすべてのカソードがお互いに接続され、コモン・アノードは7セグメントのすべてのアノードが接続されていることである。
+		今回、設計したのはコモン・カソードの種類であった。4桁の表示器に挑戦する前に、1桁の表示器を設計してみた。その結果は、次のようであった。
+		
+		
+		<center>
+			<figure>
+				<img src="C:\Users\kbalc\Desktop\svetaine\elektronika\7_seg_LED\1segment.png"  width="480" style="margin-top: 20px;">
+				<figcaption>図１　1桁表示器のモデル（シンボル）</figcaption>
+			</figure>
+		</center>
+		
+		<center>
+			<figure>
+				<img src="C:\Users\kbalc\Desktop\svetaine\elektronika\7_seg_LED\internals.png"  width="480" style="margin-top: 20px;">
+				<figcaption>図２　1桁表示器のモデルの内部回路</figcaption>
+			</figure>
+		</center>		
+		
+		<p>
+		図１、２は、私が設計した１桁７セグメント表示器のモデルと内部の回路を示している。回路の設計が難しくなかったが、一つの問題があった。
+		その問題は、LTspice上のシミュレーションでは、LEDもLEDセグメント（a、b、c、d、e、g、dp）も点滅しないこと。LEDが動作するかどうかを確認するには、
+		LED（ディスプレイのピン）に図3のように適当な抵抗を接続し、電流が流れているか確認するしかない。LEDはLTspiceの普通なライブラリーに既にあったものであった。
+		
+		</p>
+		
+		<center>
+			<figure>
+				<img src="C:\Users\kbalc\Desktop\svetaine\elektronika\7_seg_LED\testo_schema.png"  width="480" style="margin-top: 20px;">
+				<figcaption>図３　1桁表示器のテスト回路</figcaption>
+			</figure>
+		</center>
+
+		<center>
+			<figure>
+				<img src="C:\Users\kbalc\Desktop\svetaine\elektronika\7_seg_LED\testo_srezai.png"  width="480" style="margin-top: 20px;">
+				<figcaption>図４　1桁表示器のテスト結果（1）</figcaption>
+			</figure>
+		</center>
+		<center>
+			<figure>
+				<img src="C:\Users\kbalc\Desktop\svetaine\elektronika\7_seg_LED\testo_rezai2.png"  width="480" style="margin-top: 20px;">
+				<figcaption>図５　1桁表示器のテスト結果（2）</figcaption>
+			</figure>
+		</center>
+		
+		<p>
+図4、5は、左側の抵抗（R1～R4）を流れる電流が負であるのに対し、右側を流れる電流は正であることを示している。 その理由が分からなったが、4桁表示器は同じような問題がなかった。	
+		</p>
+
+		<center>
+			<figure>
+				<img src="C:\Users\kbalc\Desktop\svetaine\elektronika\7_seg_LED\4digit_piesinys.png"  width="480" style="margin-top: 20px;">
+				<figcaption>図６　４桁表示器のモデル（シンボル）</figcaption>
+			</figure>
+		</center>	
+		
+		
+		<center>
+			<figure>
+				<img src="C:\Users\kbalc\Desktop\svetaine\elektronika\7_seg_LED\4digit_internal.png"  width="940" style="margin-top: 20px;">
+				<figcaption>図７　４桁表示器のモデルの内部回路</figcaption>
+			</figure>
+		</center>			
+		
+		<p>
+1桁のディスプレイを完成させた後、図６，７に示すような4桁のディスプレイを作り始めた。コモンカソード4桁ディスプレイは、選択した桁（d1、d2、d3、d4）を接地し、セグメントに電流を供給することで動作する。
+2つ以上の数字を表示するには、両方（または複数）を接地することできない。その理由の一つは、両方の桁が同じセグメントを表示してしまうから（片方が「7」の場合、もう片方も「7」になる）。
+2つ目の理由は、LEDを追加すると、合計抵抗値が変化するため、各LEDの明るさが変わってしまうから。
+</p>
+
+		<p>
+		異なる数字を同時に表示するには、表示器の数字を速度で切り替えられる制御回路（ドライバー回路）を使う必要がある[1]。個々の桁のセグメントを人間の目にはオフにされていることがわからないような速度で切り替えると（オン・オフする）、
+		LEDの明るさが維持するだけでなく、電力も節約できる。これらのドライバー回路（IC）には通常、スイッチとして機能するトランジスタが多数含まれている。
+		
+</p>		
+		<center>
+			<figure>
+				<img src="C:\Users\kbalc\Desktop\svetaine\elektronika\7_seg_LED\4digit_testo_schema.png"  width="550" style="margin-top: 20px;">
+				<figcaption>図８　４桁表示器のテスト回路</figcaption>
+			</figure>
+		</center>		
+		
+		
+		<center>
+			<figure>
+				<img src="C:\Users\kbalc\Desktop\svetaine\elektronika\7_seg_LED\4digit_testas.png"  width="480" style="margin-top: 20px;">
+				<figcaption>図９　４桁表示器のテスト結果</figcaption>
+			</figure>
+		</center>		
+				<p>
+		図8、9は、４桁セグメント表示器のテスト回路とその結果を示している。1桁表示の場合と同様に、LTspiceで表示が機能するかどうかを確認する唯一の方法は、セグメントに接続された個々の抵抗に流れる電流をチェックすることである。
+		</p>
+		
+		</p>
+		<hr class="custom-hr">
+		<p>
+		<strong>考察：</strong>
+		
+		
+		<p>
+		LTspiceを使用して1桁と4桁の7セグメントディスプレイを作ることができた。しかし、表示器をテストする際にいくつの制限があることがわかった。もちろん、これらの制限には回避策があるが、場合によって実装が難しく、
+		思いつくのに創造性が必要になるかもしれない。また、この部品の回路には理想的なLEDが使用されているため、その特性は現実的ではないかもしれない。
+		
+		</p>
+		
+		<p>
+		LTspiceでこのコンポーネントを使う方法はたくさんあると思う。様々な回路でLEDの種類を変えながら、表示器をテストするのは面白いかもしれない。また、このような１・４桁の表示器用のドライバ回路を設計するのもいいチャレンジになるかもしれない。
+		
+		</p>
+		
+				<hr class="custom-hr">
+		<p>
+		<strong>参考文献：</strong>
+		[1]<a href ="https://softwareparticles.com/learn-how-a-4-digit-7-segment-led-display-works-and-how-to-control-it-using-an-arduino/">https://softwareparticles.com/learn-how-a-4-digit-7-segment-led-display-works-and-how-to-control-it-using-an-arduino/ </a>
+		
+		
+		</p>
+				<div id="menu" align="middle">
+			<a href="C:\Users\kbalc\Desktop\popieriai\kostolab.html">ホームページ</a> |
+            <a href="C:\Users\kbalc\Desktop\popieriai\purog.html">プログラミング系</a> |
+            <a href="C:\Users\kbalc\Desktop\popieriai\denki.html">電気電子系</a>
+        </div>
+		
+		
+		
+</div>
+	
+	
+	</body>
+</html>

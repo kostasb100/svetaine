@@ -1,0 +1,101 @@
+import pyaudio
+import threading
+from tkinter import messagebox
+from tkinter import ttk
+from mttkinter import mtTkinter as tk
+
+#選択表示(combobox)を使いやすくする
+def defocus(event):
+    event.widget.master.focus_set()
+
+#入力デバイスの扱いが簡単になる
+class input_device:
+    def __init__(self, name, index):
+        self.name = name
+        self.index = index
+
+#リアルタイムでのオーディー・プレバックを行う（録音した音すぐに再生する）
+def playback():
+    p = pyaudio.PyAudio()
+    streamIn = p.open(format=FORMATIN, channels=CHANNELS,
+                          rate=RATE, input=True, input_device_index=INDEX_SELECT,
+                          frames_per_buffer=CHUNK)
+    streamOut = p.open(format=FORMATOUT, channels=CHANNELS,
+                           rate=RATE, output=True, output_device_index=4,
+                           frames_per_buffer=CHUNK)
+    while True:
+        in_data = streamIn.read(CHUNK)
+        streamOut.write(in_data)
+
+def alert():
+    messagebox.showinfo(title= 'Error',message='Please select an input device')
+
+def change_text():
+    button1['text'] = 'End recording'
+
+#「Choose a microphone」というcomboboxで選択した入力デバイスを記録しplayback()に送信
+def index_select():
+    global INDEX_SELECT
+    if microphone_combobox.get() == devices[0].name:
+        INDEX_SELECT = devices[0].index
+    elif microphone_combobox.get() == devices[1].name:
+        INDEX_SELECT = devices[1].index
+    elif microphone_combobox.get() == devices[2].name:
+        INDEX_SELECT = devices[2].index
+
+#入力デバイスが選択されない限り、再生が始まらないようにする。
+def button_state():
+    global button1_num_clicked
+    if (
+    microphone_combobox.get() != devices[0].name and 
+    microphone_combobox.get() != devices[1].name and 
+    microphone_combobox.get() != devices[2].name
+    ):
+        alert()
+    else:
+        button1_num_clicked += 1
+        change_text()
+        index_select()
+#daemonは「End recording」がクリックされた後、プログラムが確実に停止
+        t1 = threading.Thread(target=playback,daemon = True) 
+        t1.start()
+#「End recording」は、入力デバイスを選択してから、2回目のクリックになるので、プラグラムが停止
+        if button1_num_clicked % 2 == 0:
+            window.destroy()
+
+#プレイバックのメインループに入る
+if __name__ == '__main__':
+#プレイバック設定の選択
+    button1_num_clicked = 0
+    devices = []
+    buttonClicked = False
+    p = pyaudio.PyAudio()
+    info = p.get_host_api_info_by_index(0)
+    numdevices = info.get('deviceCount')
+    FORMATIN = pyaudio.paInt16
+    FORMATOUT = pyaudio.paInt16
+    CHANNELS = 1
+    RATE = 44100
+    CHUNK = 1024
+
+    window = tk.Tk()
+    window.title('Real-time audio playback v0.1')
+    window.geometry('500x150')
+
+#アクセスできる入力デバイスの確認
+#最初の3つのデバイスがcomboboxに送信
+    for i in range(0, numdevices):
+        if (p.get_device_info_by_host_api_device_index(0, i).get('maxInputChannels')) > 0:
+            devices.append(input_device(p.get_device_info_by_host_api_device_index(0, i).get('name'), i))
+
+#comboboxとその他ボタンの設定、調整
+    microphone = tk.Label(window, text="Choose a microphone")
+    microphone_combobox = ttk.Combobox(window, values = [devices[0].name,devices[1].name,devices[2].name])
+    microphone.place(x=80, y=40)
+    microphone_combobox.place(x=260, y=40)
+    microphone_combobox.bind("<FocusIn>", defocus)
+
+    button1 = tk.Button(window, text="Start recording", command=button_state)
+    button1.place(x=200, y=80)
+
+    window.mainloop()

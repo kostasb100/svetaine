@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ja">
+	<head>
+		<meta charset="UTF-8">
+		<title>voice_playback(v0.1)</title>
+		<style>
+		body{
+		background-color: rgba(0, 0, 0, 0.8);
+		}
+		.container {
+		    max-width: 1000px; 
+            margin: 0 auto; 
+            padding: 40px; 
+            background-color: rgba(0.5, 0.3, 0.1, 0.6); 
+		}
+        .code-container {
+            overflow-x: auto; /* Add horizontal scrolling */
+            white-space: nowrap; /* Prevent wrapping */
+            background-color: #222; /* Optional: change background for visibility */
+            padding: 10px; /* Optional: add padding */
+            border-radius: 5px; /* Optional: round corners */
+        }
+        pre {
+            margin: 0; /* Remove margin */
+            color: white; /* Change text color */
+        }		
+  .custom-hr {
+    border: none;          /* Remove default border */
+    height: 2px;          /* Set height */
+    background-color: #ccc; /* Set color */
+    margin: 20px 0;       /* Set margin for spacing */
+  }
+  
+.last-edited {
+    color: rgba(136, 136, 136, 0.7); /* Faded color */
+    font-size: 0.9em; /* Make it slightly smaller */
+    margin-top: 10px; /* Add some space above */
+    text-align: right; /* Align text to the left */
+    display: block; /* Ensure it behaves as a block element */
+}  
+		</style>
+	</head>
+	
+	<body>
+		<font color="white">
+	<div class ="container">
+		<center>
+		<h1>リアルタイム音声の再生（プレイバック）プログラムの開発(v0.1)</h1>
+		</center>
+ <p class="last-edited">投稿日: 2024年9月29日</p>
+ <p class="last-edited">最終更新日: 2024年9月29日</p>
+		<p>
+		
+		<strong>問題：</strong>
+		
+		日本語のスピーキングを練習するためにシャドーイング（自分の声を録音し、即座に再生音を聞くこと）をしたい。 
+		しかし、音声の即時再生機能（リアルタイムのオーディオプレイバック）は通常、マイクの品質をチェックするための他のプログラムの機能にすぎないので、
+		これができる専用のプログラムがあまりない。
+		</p>
+		<hr class="custom-hr">
+		<p>
+		<strong>解決策：</strong>Pythonを使って自分でリアルタイム音声の再生（プレイバック）のプログラムを作る
+		</p>
+		<hr class="custom-hr">
+		<p>
+		<strong>結果：</strong>
+		Pythonでプログラミングする大きな利点の一つは、たくさんのライブラリーがあることである。今回のプロジェクトは、
+		その利点を活用し、４つのライブラリーを使用した。そのライブラリーは以下の通りである。
+		
+		<p>
+		<code style="font-family: 'Courier New', Courier, monospace;">
+		pyaudio
+		</code>
+		音声を録音し、即座に再生する
+		</p>
+		</p>
+		<p>
+		<code style="font-family: 'Courier New', Courier, monospace;">
+		tkinter
+		</code>
+		誰でも使えるようなGUI（General User Interface）を作る
+		</p>
+		<p>
+		<code style="font-family: 'Courier New', Courier, monospace;">
+		threading
+		</code>
+		2つのループが重なり、プログラムが停止を防ぐ
+		</p>
+		<p>
+		<code style="font-family: 'Courier New', Courier, monospace;">
+		mttkinter
+		</code>
+		tkinterを使用する時のthreadingを使いやすくする
+		</p>
+		プログラムの全コードを説明する前に、このプログラムの動作を部分的に解説したいと思う。
+		最初に、このプログラムのGUIはどいうものなのか見てみよう。
+		プログラムを開くと、次のような画面が表示される。
+		
+		<center>
+			<figure>
+				<img src="C:\Users\kbalc\Desktop\svetaine\programavimas\audio_playback_v0.1\kodas_paveiks\initial.png"  width="480" style="margin-top: 20px;">
+				<figcaption>図１　プログラムのGUI（1）</figcaption>
+			</figure>
+		</center>
+		
+		図１に示すように、プログラムの画面には「入力デバイスの選択」（choose a microphone）と「スタート」(Start reording)という２つボタンだけがあり、非常にシンプルな構成になっている。
+		
+		図２より、入力デバイスの選択を選択しない限り、プログラムが動作しない。
+		
+		<center>
+			<figure>
+				<img src="C:\Users\kbalc\Desktop\svetaine\programavimas\audio_playback_v0.1\kodas_paveiks\niekasnp.png"  width="480" style="margin-top: 20px;">
+				<figcaption>図２　プログラムのGUI（2）</figcaption>
+			</figure>
+		</center>
+		
+		図３、４に示すように、入力デバイスの選択をしたら、リアルタイム音声再生が始まる。「End recording」をクリックすると、その動作が停止し、プログラムが自動的に終了する。
+		<center>
+			<figure>
+				<img src="C:\Users\kbalc\Desktop\svetaine\programavimas\audio_playback_v0.1\kodas_paveiks\pasirinkimai.png"  width="480" style="margin-top: 20px;">
+				<figcaption>図３　プログラムのGUI（3）</figcaption>
+			</figure>
+		</center>
+		
+		<center>
+			<figure>
+				<img src="C:\Users\kbalc\Desktop\svetaine\programavimas\audio_playback_v0.1\kodas_paveiks\recording.png"  width="480" style="margin-top: 20px;">
+				<figcaption>図４　プログラムのGUI（4）</figcaption>
+			</figure>
+		</center>
+				
+		
+		ここからはコードを部分的に分割し、それぞれの部分についてもっと詳しく説明する。
+		ただし、わかりやすい部分は省略する。
+		<div class="code-container">			
+		<pre><code style="font-family: 'Courier New', Courier, monospace;">
+		def defocus(event):
+			event.widget.master.focus_set()
+
+		class input_device:
+			def __init__(self, name, index):
+				self.name = name
+				self.index = index
+		</code></pre>
+		</div>
+		上記のコードでは、ライブラリーをインポートし、入力デバイスの選択表示（comboboxとも言う）を使いやすくする。
+		また、classを使用し、プログラムの他の部分でも入力デバイスを操作しやすくする。
+		<div class="code-container">		
+		<pre><code style="font-family: 'Courier New', Courier, monospace;">
+		def playback():
+			p = pyaudio.PyAudio()
+			streamIn = p.open(format=FORMATIN, channels=CHANNELS,
+						 rate=RATE, input=True, input_device_index=INDEX_SELECT,
+						 frames_per_buffer=CHUNK)
+			streamOut = p.open(format=FORMATOUT, channels=CHANNELS,
+						 rate=RATE, output=True, output_device_index=4,
+						 frames_per_buffer=CHUNK)
+			while True:
+				in_data = streamIn.read(CHUNK)
+				streamOut.write(in_data)
+		</code></pre>
+		</div>
+		playback()はプログラムの一番重要なループである。pyaudioライブラリーを使用して同時に音声の入力と出力を開始する。
+		実際に、入力と出力の音声が若干の遅れ（数百ms程度）があることがわかったが、それほど大きな問題ではなかった。
+		ただし、今後のバージョンでは、この遅れを改善した方がいいかもしれない。
+		
+		<div class="code-container">
+		<pre><code style="font-family: 'Courier New', Courier, monospace;">
+		def index_select():
+			global INDEX_SELECT
+			if microphone_combobox.get() == devices[0].name:
+				INDEX_SELECT = devices[0].index
+			elif microphone_combobox.get() == devices[1].name:
+				INDEX_SELECT = devices[1].index
+			elif microphone_combobox.get() == devices[2].name:
+				INDEX_SELECT = devices[2].index
+		</code></pre>
+		</div>
+		index_select()は、選択された入力デバイスの情報をplayback()に送信する。コンピュータが見つけた最初の3つの入力デバイスだけの確認が可能。
+		今後のバージョンでは、たとえばforループを使って利用可能なすべてのデバイスをチェックするようにするといいかもしれない。
+        <div class="code-container">			
+		<pre><code style="font-family: 'Courier New', Courier, monospace;">
+		def button_state():
+			global button1_num_clicked
+			if (
+			microphone_combobox.get() != devices[0].name and
+			microphone_combobox.get() != devices[1].name and
+			microphone_combobox.get() != devices[2].name
+			):
+				alert()
+			else:
+				button1_num_clicked += 1
+				change_text()
+				index_select()
+				t1 = threading.Thread(target=playback,daemon = True)
+				t1.start()
+				if button1_num_clicked % 2 == 0:
+					window.destroy()
+		
+		</code></pre>
+		</div>
+		button_state()は、入力デバイスが選択されているかどうかをチェックする。もしそうなら、button1_num_clicked変数をインクリメントし、
+		スレッドを使ってplayback()を開始する。「End recording」のボタンが押されると、
+		button1_num_clicked変数が再びインクリメントされ、2になっているので、プログラムは自動的に終了する。
+		プログラムを停止する方法は他にもいろいろ試したが、正しく動作したのはこれだけの方法だった。
+		もちろん、私が知らないもっと効率的な方法があるかもしれない。プログラムの残りは、GUIインターフェースのセットアップだけなので、省略する。
+		
+		<hr class="custom-hr">
+		<p>
+		<strong>考察：</strong>
+		
+		<p>
+		pythonのいくつかのライブラリーを活用することで、、リアルタイムでオーディオを再生するプログラムを作成ことができることがわかった。
+		しかし、万能なライブラリーは存在しないため、互換性の問題が発生することがある。今回はプログラムが小規模だったので、互換性の問題を解決するのは
+		それほど難しくなかった。しかし、もっと大きなプログラムになると、開発者はライブラリを調整したり、独自のライブラリを作ったりしなければならないかもしれない。
+		このプロジェクトを通じて、エンジニアは多くの問題を解決するためにフレキシブルであることの必要性を改めて感じた。
+		</p>
+		
+		<p>
+		このプログラムにはいくつもの改善点がある。入力デバイスの選択ボックスは最初の3つのデバイスだけに制限されているので、
+		これを利用可能なすべてのデバイスに変更できる。また、出力デバイス（スピーカー、ヘッドフォン）の選択ボックスや、
+		録音のその他の設定（frames_per_buffer、フォーマットなど）を手動で調整できる機能を追加することもできる。
+		もちろん、コードをより効率的にし、GUIをより綺麗なものにすることもできるだろう。
+		</p>
+		<p>
+		これはまだプログラムのv0.1(バージョン0.1)なので、今のところ公開する予定はない。しかし、必要なライブラリーをインポートし、コードをコピーしたら、誰でもプログラムを実行するのは可能である。
+		このプログラムを使う方法のひとつは、外国語の録音（ポッドキャストやYouTubeの動画）を再生し、
+		できるだけ速く自分でその音声を発音してみることである。これを1日20～30分続けることで、
+		私はこのプログラムで日本語のスピーキングスキルを向上させたが、英語や他の外国語にも使えると思う。
+		</p>
+		
+		
+		
+		
+		<hr class="custom-hr">
+		全コードは次の通りである。
+        <div class="code-container">		
+		<pre><code style="font-family: 'Courier New', Courier, monospace;">
+import pyaudio
+import threading
+from tkinter import messagebox
+from tkinter import ttk
+from mttkinter import mtTkinter as tk
+
+#選択表示(combobox)を使いやすくする
+def defocus(event):
+    event.widget.master.focus_set()
+
+#入力デバイスの扱いが簡単になる
+class input_device:
+    def __init__(self, name, index):
+        self.name = name
+        self.index = index
+
+#リアルタイムでのプレイバックを行う（録音した音すぐに再生する）
+def playback():
+    p = pyaudio.PyAudio()
+    streamIn = p.open(format=FORMATIN, channels=CHANNELS,
+                        rate=RATE, input=True, input_device_index=INDEX_SELECT,
+                        frames_per_buffer=CHUNK)
+    streamOut = p.open(format=FORMATOUT, channels=CHANNELS,
+                        rate=RATE, output=True, output_device_index=4,
+                        frames_per_buffer=CHUNK)
+    while True:
+        in_data = streamIn.read(CHUNK)
+        streamOut.write(in_data)
+
+def alert():
+    messagebox.showinfo(title= 'Error',message='Please select an input device')
+
+def change_text():
+    button1['text'] = 'End recording'
+
+#「Choose a microphone」というcomboboxで選択した入力デバイスを記録しplayback()に送信
+def index_select():
+    global INDEX_SELECT
+    if microphone_combobox.get() == devices[0].name:
+        INDEX_SELECT = devices[0].index
+    elif microphone_combobox.get() == devices[1].name:
+        INDEX_SELECT = devices[1].index
+    elif microphone_combobox.get() == devices[2].name:
+        INDEX_SELECT = devices[2].index
+
+#入力デバイスが選択されない限り、再生が始まらないようにする
+def button_state():
+    global button1_num_clicked
+    if (
+    microphone_combobox.get() != devices[0].name and 
+    microphone_combobox.get() != devices[1].name and 
+    microphone_combobox.get() != devices[2].name
+    ):
+        alert()
+    else:
+        button1_num_clicked += 1
+        change_text()
+        index_select()
+#daemonは「End recording」がクリックされた後、プログラムが確実に停止
+        t1 = threading.Thread(target=playback,daemon = True) 
+        t1.start()
+#「End recording」は、入力デバイスを選択してから、2回目のクリックになるので、プラグラムが停止
+        if button1_num_clicked % 2 == 0:
+            window.destroy()
+
+#プレイバックのメインループに入る
+if __name__ == '__main__':
+#プレイバック設定の選択
+    button1_num_clicked = 0
+    devices = []
+    buttonClicked = False
+    p = pyaudio.PyAudio()
+    info = p.get_host_api_info_by_index(0)
+    numdevices = info.get('deviceCount')
+    FORMATIN = pyaudio.paInt16
+    FORMATOUT = pyaudio.paInt16
+    CHANNELS = 1
+    RATE = 44100
+    CHUNK = 1024
+
+    window = tk.Tk()
+    window.title('Real-time audio playback v0.1')
+    window.geometry('500x150')
+
+#アクセスできる入力デバイスの確認
+#最初の3つのデバイスがcomboboxに送信
+    for i in range(0, numdevices):
+        if (p.get_device_info_by_host_api_device_index(0, i).get('maxInputChannels')) > 0:
+            devices.append(input_device(p.get_device_info_by_host_api_device_index(0, i).get('name'), i))
+
+#comboboxとその他ボタンの設定、調整
+    microphone = tk.Label(window, text="Choose a microphone")
+    microphone_combobox = ttk.Combobox(window, values = [devices[0].name,devices[1].name,devices[2].name])
+    microphone.place(x=80, y=40)
+    microphone_combobox.place(x=260, y=40)
+    microphone_combobox.bind("<FocusIn>", defocus)
+
+    button1 = tk.Button(window, text="Start recording", command=button_state)
+    button1.place(x=200, y=80)
+
+    window.mainloop()		
+		</code></pre>
+	</div>
+	
+	
+			<div id="menu" align="middle">
+			<a href="C:\Users\kbalc\Desktop\popieriai\kostolab.html">ホームページ</a> |
+            <a href="C:\Users\kbalc\Desktop\popieriai\purog.html">プログラミング系</a> |
+            <a href="C:\Users\kbalc\Desktop\popieriai\denki.html">電気電子系</a>
+        </div>
+</div>
+	
+	
+	</body>
+</html>

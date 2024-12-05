@@ -1,6 +1,6 @@
 body {
     background-color: rgba(0, 0, 0, 0.8);
-	color: white; /* Ensures all text within the body is white */
+	color: white; 
 }
 
 .container {
@@ -8,7 +8,7 @@ body {
     margin: 0 auto; 
     padding: 40px; 
     background-color: rgba(0.5, 0.3, 0.1, 0.6); 
-	color: white; /* Ensures all text within the body is white */
+	color: white; 
 }
 
 .header-image {
@@ -60,31 +60,31 @@ body {
 }
 
 .code-container {
-    overflow-x: auto; /* Add horizontal scrolling */
-    white-space: nowrap; /* Prevent wrapping */
-    background-color: #222; /* Optional: change background for visibility */
-    padding: 10px; /* Optional: add padding */
-    border-radius: 5px; /* Optional: round corners */
+    overflow-x: auto; 
+    white-space: nowrap; 
+    background-color: #222; 
+    padding: 10px; 
+    border-radius: 5px; 
 }
 
 pre {
-    margin: 0; /* Remove margin */
-    color: white; /* Change text color */
+    margin: 0; 
+    color: white; 
 }
 
 .last-edited {
-    color: rgba(136, 136, 136, 0.7); /* Faded color */
-    font-size: 0.9em; /* Make it slightly smaller */
-    margin-top: 10px; /* Add some space above */
-    text-align: left; /* Align text to the left */
-    display: block; /* Ensure it behaves as a block element */
+    color: rgba(136, 136, 136, 0.7); 
+    font-size: 0.9em; 
+    margin-top: 10px; 
+    text-align: left; 
+    display: block; 
 }
 
 .custom-hr {
-    border: none;          /* Remove default border */
-    height: 2px;           /* Set height */
-    background-color: #ccc; /* Set color */
-    margin: 20px 0;        /* Set margin for spacing */
+    border: none;          
+    height: 2px;         
+    background-color: #ccc;
+    margin: 20px 0;
 }
 
 		

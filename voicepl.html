@@ -133,7 +133,7 @@
 		ここからはコードを部分的に分割し、それぞれの部分についてもっと詳しく説明する。
 		ただし、わかりやすい部分は省略する。
 		<div class="code-container">			
-		<pre><code style="font-family: 'Courier New', Courier, monospace;">
+		<pre>
 		def defocus(event):
 			event.widget.master.focus_set()
 
@@ -146,7 +146,7 @@
 		上記のコードでは、ライブラリーをインポートし、入力デバイスの選択表示（comboboxとも言う）を使いやすくする。
 		また、classを使用し、プログラムの他の部分でも入力デバイスを操作しやすくする。
 		<div class="code-container">		
-		<pre><code style="font-family: 'Courier New', Courier, monospace;">
+		<pre>
 		def playback():
 			p = pyaudio.PyAudio()
 			streamIn = p.open(format=FORMATIN, channels=CHANNELS,
@@ -165,7 +165,7 @@
 		ただし、今後のバージョンでは、この遅れを改善した方がいいかもしれない。
 		
 		<div class="code-container">
-		<pre><code style="font-family: 'Courier New', Courier, monospace;">
+		<pre>
 		def index_select():
 			global INDEX_SELECT
 			if microphone_combobox.get() == devices[0].name:
@@ -179,7 +179,7 @@
 		index_select()は、選択された入力デバイスの情報をplayback()に送信する。コンピュータが見つけた最初の3つの入力デバイスだけの確認が可能。
 		今後のバージョンでは、たとえばforループを使って利用可能なすべてのデバイスをチェックするようにするといいかもしれない。
         <div class="code-container">			
-		<pre><code style="font-family: 'Courier New', Courier, monospace;">
+		<pre>
 		def button_state():
 			global button1_num_clicked
 			if (
@@ -235,7 +235,7 @@
 		<hr class="custom-hr">
 		全コードは次の通りである。
         <div class="code-container">		
-		<pre><code style="font-family: 'Courier New', Courier, monospace;">
+		<pre>
 import pyaudio
 import threading
 from tkinter import messagebox

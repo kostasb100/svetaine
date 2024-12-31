@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>MATLABによる浮世絵の画像処理</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+	<body>
+		<font color="white">
+	<div class ="container">
+		<center>
+		<h1>MATLABによる浮世絵の画像処理</h1>
+		</center>
+		<right>
+ <p class="last-edited">投稿日: 2024年12月31日</p>
+ <p class="last-edited">最終更新日: 2024年12月31日</p>
+		</right>
+		<p>
+		
+		<strong>問題：</strong>
+		一枚の浮世絵の画像にあるくずし字が読めない。
+		</p>
+		<hr class="custom-hr">
+		
+		<p>
+		<strong>解決策：</strong>
+		MATLABを使用して画像処理を行い、くずし字を読みやすくする。
+		
+		</p>
+		
+				<hr class="custom-hr">
+				
+				<strong>結果：</strong>
+				
+		今回画像処理を行った画像（浮世絵）は図１に示す。この浮世絵の画像はスマートフォンのカメラで撮影したため、画質に若干の問題があった。
+		文字（くずし字）の部分の画質を向上させるため、それぞれの部分を個別に撮影した。
+		
+		
+		<center>
+			<figure>
+				<img src="C:\Users\kbalc\Desktop\svetaine\programavimas\ukiyoe\full_image.jpg"  width="450" style="margin-top: 20px;">
+				<figcaption>図１　浮世絵の写真</figcaption>
+			</figure>
+		</center>	
+		
+		WindowsのPhotosというアプリを使用してこれらの写真をさらにクリッピングし、最終的に
+		図2、3に示すような写真を得られた。図２の左にある白い点は、スマホカメラのフラッシュライトの反射であった。
+		
+		<center>
+			<figure>
+				<img src="C:\Users\kbalc\Desktop\svetaine\programavimas\ukiyoe\top_right_corner1_(only_text).jpg"  width="250" style="margin-top: 20px;">
+				<figcaption>図２　クリッピングしたくずし字(上側)</figcaption>
+			</figure>
+		</center>			
+		
+		<center>
+			<figure>
+				<img src="C:\Users\kbalc\Desktop\svetaine\programavimas\ukiyoe\bottom_text_only.jpg"  width="250" style="margin-top: 20px;">
+				<figcaption>図３　クリッピングしたくずし字(下側)</figcaption>
+			</figure>
+		</center>			
+		
+		
+		図２、画像の上側には「あさ角の巻」という文字が書かれていることがすぐに分かったが、
+		その右にあった文字は色あせていたため、読みにくかった。図３から、「佐藤帛清」と「芳」を読めるが、図２と同様の
+		問題でそれ以外の文字を読めなかった。これらの結果から、今回の画像処理における主な課題は、各文字の線の視認性を高めることであり、
+		その画質を向上することではないことがわかった。
+		そのため、MATLABを使ってこれらの画像をさまざまな方法で変更（処理）してみた。
+		
+		まず、図２をさらに切り取り、読みにくい部分のみを残した。次のコードを実行し、その画像をグレースケール画像に変換した。
+		その結果を図４に示す。
+		
+				<div class="code-container">
+		<code><pre>
+top_right_text = imread('top_right_corner1_(only_right_text).jpg');
+I1 = rgb2gray(top_right_text);
+figure,imshowpair(top_right_text,I1,"montage");
+		</code>	</pre>	
+		</div>
+		
+		<center>
+			<figure>
+				<img src="C:\Users\kbalc\Desktop\svetaine\programavimas\ukiyoe\galutinis_rezas\1a.jpg"  width="250" style="margin-top: 20px;">
+				<figcaption>図４　原画像（左）、グレースケール画像（右）</figcaption>
+			</figure>
+		</center>	
+		
+		
+		グレースケール画像は、画像はさまざまな灰色の階調で表現されるものである。図４に示すように、今回の画像をグレースケールにしたら、文字の線が少しだけ見やすくなった。
+		
+		
+		次に、以下のコードでグレースケール画像をシャープ化（画像の輪郭を強調すること）してみた。
+		
+		
+						<div class="code-container">
+		<code><pre>
+b1 = imsharpen(I1);
+figure,imshowpair(top_right_text,b1,"montage");
+		</code>	</pre>	
+		</div>
+		
+		コードをb1のように実行すればいいが、シャープ化のパラメーター（Radius, Amount,Threshold）も変更できる。
+		Radiusはシャープ化される輪郭周辺の領域を設定し、大きいほど、その領域が広くなる。デフォルト値は１である。
+		Amountはシャープニング効果の強さを設定する。値が大きいほど、シャープ化されたピクセルのコントラストが大きくなる。デフォルト値は0.8。
+		Thresholdはシャープ化される輪郭の領域を設定する。値は0から１までの範囲である。0の場合、滑らかな領域もシャープ化される。1の場合、
+		コントラストの高い領域のみをシャープ化される。デフォルト値は0。図５，６，７は様々なパラメータでのシャープ化の結果を示す。
+		
+		<center>
+			<figure>
+				<img src="C:\Users\kbalc\Desktop\svetaine\programavimas\ukiyoe\galutinis_rezas\1.jpg"  width="350" style="margin-top: 20px;">
+				<figcaption>図５　グレースケール画像（１）、デフォルトのパラメータでシャープ化された画像（２）、Radius = 8でシャープ化された画像（３）、Radius = 32でシャープ化された画像（４）</figcaption>
+			</figure>
+		</center>			
+		
+		図5を示すように、Amount、ThresholdはデフォルトのままでRadiusを変えても文字があまり変わらいことが分かったが、デフォルトのパラメータで文字が少しだけ濃くなった。
+		
+		<center>
+			<figure>
+				<img src="C:\Users\kbalc\Desktop\svetaine\programavimas\ukiyoe\galutinis_rezas\2.jpg"  width="350" style="margin-top: 20px;">
+				<figcaption>図６　デフォルトのパラメータでシャープ化された画像（１）、Amount = 2（２）、Amount = 4（３）、Amount = 8（４）</figcaption>
+			</figure>
+		</center>			
+		
+		図6より、RadiusとThresholdはデフォルトのままで、Amountを変更したところ、デフォルトのパラメータでは文字のコントラストが向上すると同時に、周囲のもののコントラストも向上し、画像が粗くなった。
+		図７は、同様なパラメータでThresholdを１にしたときの処理の結果を示している。
+		
+		
+		<center>
+			<figure>
+				<img src="C:\Users\kbalc\Desktop\svetaine\programavimas\ukiyoe\galutinis_rezas\3.jpg"  width="350" style="margin-top: 20px;">
+				<figcaption>図７　デフォルトのパラメータでシャープ化された画像（１）、Amount = 2とThreshold = 1（２）、Amount = 4とThreshold = 1（３）、Amount = 8とThreshold = 1（４）</figcaption>
+			</figure>
+		</center>			
+				
+		Thresholdを1に設定した結果、Amountの上昇による粗さは解消されたものの、画像はぼやけはじめた。
+		次に、コントラストを上げるのではなく、文字の黒線の輪郭を検出するという別のアプローチを試みた。以下のコードを実行し、Canny、Zerocross、Roberts、Prewittという輪郭検出フィルターをグレースケール画像I1に適用した。
+		図８は、その結果を示す。
+		
+						<div class="code-container">
+		<code><pre>
+BW1 = edge(I1,'Canny');
+BW2 = edge(I1,'zerocross');
+BW3 = edge(I1,'Roberts');
+BW4 = edge(I1,'Prewitt');
+imagelist = {BW1 BW2 BW3 BW4};
+figure,montage(imagelist);
+		</code>	</pre>	
+		</div>
+
+		<center>
+			<figure>
+				<img src="C:\Users\kbalc\Desktop\svetaine\programavimas\ukiyoe\galutinis_rezas\4.jpg"  width="350" style="margin-top: 20px;">
+				<figcaption>図８　Canny（１）、Zerocross（２）、Roberts（３）、Prewitt（４）</figcaption>
+			</figure>
+		</center>
+		
+		デフォルトのパラメータでは、4つのフィルターの中でCannyフィルターが最も多くの線を検出したことが分かった。しかし、
+		文字の周りに他の線が数多くあり、文字そのものが良く見えない。CannyのThresholdを変えたら、図９に示すような結果を得られた。
+		
+		
+		
+				<center>
+			<figure>
+				<img src="C:\Users\kbalc\Desktop\svetaine\programavimas\ukiyoe\galutinis_rezas\5.jpg"  width="350" style="margin-top: 20px;">
+				<figcaption>図９　デフォルトCanny（１）、Threshold = [0.1 0.3]（２）、Threshold = [0.2 0.4]（３）、Threshold = [0.5 0.7]（４）</figcaption>
+			</figure>
+		</center>	
+		
+		Thresholdの下限と上限の値を高くすることで、不要な線は取り除かれたものの、文字の線も取り除かれてしまった。 Thresholdが[0.2 0.4]でCannyフィルターの標準偏差sigmaも変えてみた。
+		図１０はその結果を示す。
+		
+				<center>
+			<figure>
+				<img src="C:\Users\kbalc\Desktop\svetaine\programavimas\ukiyoe\galutinis_rezas\6.jpg"  width="350" style="margin-top: 20px;">
+				<figcaption>図10　デフォルトのsigma（１）、sigma = 2（２）、sigma = 3（３）、sigma = 4（４）</figcaption>
+			</figure>
+		</center>			
+		
+		図１０に示すよう、sigmaのを大きくすると、最も滑らかなラインだけが残ることになるが、文字の線のすべては滑らかではなかったため、文字情報も消えてしまった。
+		従って、今回は輪郭フィルターはあまり役に立たないことがわかりましたが、自動的にパラメーターを何百回も変更し、適切なパラメータを見つけることができれば、役に立つかもしれない。
+		
+		
+		最後の手段として 、ヒストグラム均等化を使用してグレースケール画像I1のコントラストを調整し、その結果を反転してみた。次のコードでそれが実現できた。
+		
+						<div class="code-container">
+		<code><pre>
+J1 = histeq(I1);
+inv_J1 = uint8(255) - J1;
+imagelist = {top_right_text I1 J1 inv_J1};
+figure,montage(imagelist)
+		</code>	</pre>	
+		</div>		
+		
+図11にその結果を示し、今回一番いい結果であった。		
+		
+				<center>
+			<figure>
+				<img src="C:\Users\kbalc\Desktop\svetaine\programavimas\ukiyoe\galutinis_rezas\7.jpg"  width="350" style="margin-top: 20px;">
+				<figcaption>図１１　原画像（１）、グレースケール画像（２）、ヒストグラム均等化の調整を行った画像（３）、白と黒が反転した画像（４）</figcaption>
+			</figure>
+		</center>			
+
+
+同様な処理を浮世絵の下側の文字に適用した結果を図12に示す。
+
+				<center>
+			<figure>
+				<img src="C:\Users\kbalc\Desktop\svetaine\programavimas\ukiyoe\galutinis_rezas\8.jpg"  width="350" style="margin-top: 20px;">
+				<figcaption>図１２　原画像（１）、グレースケール画像（２）、ヒストグラム均等化の調整を行った画像（３）、白と黒が反転した画像（４）</figcaption>
+			</figure>
+		</center>	
+
+
+		
+		<p>
+		<strong>考察：</strong>
+		
+		<p>
+		今回の画像処理を通じて、思い描いていたアイデアが必ずしも期待通りの結果を生むわけではないこと、また、ごくわずかな成果のために多くの時間を費やす前に、
+		適切なタイミングでプロジェクトを中止し、一旦アップローチを見直すことの重要性を学んだ。
+		</p>
+		
+		
+		<p>
+		今回、浮世絵のくずし字を読みやすくしようと試みたが、結局結果はあまり良くなく、当初の目標を達成することはできなかった。
+		
+		浮世絵の写真をプロフェショナルなカメラやスキャナー等で撮れたより画質の高い画像を撮ることができたら、一文字一文字をズームインし、文字ごとに画像処理を行い、もっと良い結果が得られたかもしれない。
+		浮世絵の色褪せによって、ある文字には特定な処理方法が有効であっても、必ずしも同じ方法が適用できないからである。また、パラメータを手動で調整するのは非常に時間がかかる。
+		さまざまなパラメータや画像処理の方法をテストができるプログラムを作ると便利だろう。
+		
+		
+		
+		
+		</p>
+		
+		
+		</p>
+		
+		
+		<hr class="custom-hr">
+		最終的なMATLABのコードは次の通りである。
+        <div class="code-container">		
+		<pre>
+top_right_text = imread('top_right_corner1_(only_right_text).jpg');　%指定した画像を読み込む
+bottom_text = imread('bottom_text_only.jpg');　
+
+I1 = rgb2gray(top_right_text);　%グレースケールへの変換
+I2 = rgb2gray(bottom_text); 
+
+J1 = histeq(I1);%グレースケール画像のヒストグラムがほぼフラットになるように、I1の変換
+J2 = histeq(I2);
+
+inv_J1 = uint8(255) - J1; %グレースケール画像J1の色を反転（白は黒に、黒は白に）
+inv_J2 = uint8(255) - J2;
+
+imagelist1 = {top_right_text I1 J1 inv_J1}; %4枚の画像を同時に表示
+figure,montage(imagelist1)
+
+imagelist2 = {bottom_text_only I2 J2 inv_J2};
+figure,montage(imagelist2)		
+				</code></pre>
+	</div>
+	
+	
+					<hr class="custom-hr">
+	<strong>参考文献：</strong>
+	
+	
+	
+	
+	<p>[1]<a href ="https://jp.mathworks.com/help/matlab/ref/rgb2gray.html">https://jp.mathworks.com/help/matlab/ref/rgb2gray.html</a></p>
+	<p>[2]<a href ="https://jp.mathworks.com/help/images/ref/imsharpen.html">https://jp.mathworks.com/help/images/ref/imsharpen.html</a></p>
+	<p>[3]<a href ="https://www.geeksforgeeks.org/unsharp-masking-using-matlab/">https://www.geeksforgeeks.org/unsharp-masking-using-matlab/</a></p>
+	<p>[4]<a href ="https://jp.mathworks.com/help/images/histogram-equalization.html">	https://jp.mathworks.com/help/images/histogram-equalization.html</a></p>
+	<p>[5]<a href ="https://jp.mathworks.com/help/images/ref/edge.html">https://jp.mathworks.com/help/images/ref/edge.html</a></p>
+	
+	
+	
+	
+	
+	
+						<div id="menu" align="middle">
+			<a href="C:\Users\kbalc\Desktop\popieriai\kostolab.html">ホームページ</a> |
+            <a href="C:\Users\kbalc\Desktop\popieriai\purog.html">プログラミング系</a> |
+            <a href="C:\Users\kbalc\Desktop\popieriai\denki.html">電気電子系</a>
+        </div>
+			
+		
+</div>
+	
+	
+	</body>
+</html>

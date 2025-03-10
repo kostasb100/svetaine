@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ja">
+	<head>
+		<meta charset="UTF-8">
+		<title>NE555を用いた傾斜センサーの設計</title>
+		<link rel="stylesheet" href="styles.css">
+	</head>
+	
+	<body>
+		<font color="white">
+	<div class ="container">
+		<center>
+		<h1>NE555を用いた傾斜センサーの設計</h1>
+		</center>
+ <p class="last-edited">投稿日: 2025年03月05日</p>
+ <p class="last-edited">最終更新日: 2025年03月05日</p>
+		<p>
+		
+		<strong>問題：</strong>
+
+		NE555という一般的に使用されているタイマーICチップについて理解を深めたい。また、購入したエレクトロニクスのスターターキットに含まれている傾斜スイッチ（SW-520D）も試してみたい。
+		
+		<hr class="custom-hr">
+		<strong>解決策：</strong>
+		NE555と傾斜スイッチを使用した簡単な傾斜センサーを作り、NE555や回路設計についての知識を深める。
+		
+		
+		
+		</p>
+		<hr class="custom-hr">
+
+		<p>
+		<strong>結果：</strong>
+		NE555は、双安定モード（バイステーブル）、単安定モード（モノステーブル）、無安定モード（アステーブル）の3つの動作モードを持つチップである。双安定モードではフリップフロップ、単安定モードではパルス発生器、無安定モードでは発振回路として動作させることができる。
+		今回のプロジェクトでは、双安定モードを使う。図１は、NE555ピンの配置を示す。
+		
+		
+		<center>
+			<figure>
+				<img src="C:\Users\kbalc\Desktop\svetaine\elektronika\555_keisha\555.png"  width="480" style="margin-top: 20px;">
+				<figcaption>図１　NE555とそのピン（左：LTspiceモデル、右：実際のチップ）</figcaption>
+			</figure>
+		</center>
+		
+		それぞれのピンの役割は次のようになっている。
+		
+		<p>
+		1(GND):グラウンドピン。
+		</p>
+		
+		<p>
+		2(TRIG):トリガー(Trigger)ピン。LOW（Vccの1/3）になると、3番目の出力ピンをHIGHにさせる。
+		</p>
+		
+	    <p>
+		3(OUT):出力(Output)ピン。おおよそVcc-1.5 [V]の電圧を出力する。出力電流は100～200[mA]程度である。
+		</p>
+		
+		<p>
+		4(RST):リーセット(Reset)ピン。LOWになると、回路をリーセットする。通常はHIGHになる必要がある。
+		</p>
+		
+		<p>
+		5(CVまたはCTRL):コントローラ(Control)ピン。シュレスホールドピンの電圧を制御（コントロール）する。ノイズ対策のため、グランドに接続した0.01[μF] のコンデンサと接続することが多い。
+		</p>
+
+		<p>
+		6(THRS):シュレスホールド（閾値）ピン。Vccの2/3になると、出力をLOWにする。
+		</p>	
+
+		<p>
+		7(DISまたはDISCH):ディスチャージピン。出力が HIGH のときはフロート（オープン）、LOW のときはグラウンドと接続される。
+		</p>
+
+		<p>
+		8(Vcc):正電源ピン（4.5～15[V]）。
+		</p>	
+
+		今回設計した回路は、図２、３に示す。I1は電子ブザーで、SW1は傾斜スイッチである。電源は2個の3[V]ボタン型電池(CR2032)は理想だが、それ以外の電池も使ってよい。
+		ただし、電子ブザーがどのくらいの電圧を必要とするのかを確認し、それに基づいて電池を選ぶことが重要である（電池の電圧の6割程度しかブザーに出力されない）。
+		
+		
+		
+		<center>
+			<figure>
+				<img src="C:\Users\kbalc\Desktop\svetaine\elektronika\555_keisha\kairo(pakrypes).png"  width="480" style="margin-top: 20px;">
+				<figcaption>図２　NE555を用いた傾斜センサー回路</figcaption>
+			</figure>
+		</center>		
+		
+		<center>
+			<figure>
+				<img src="C:\Users\kbalc\Desktop\svetaine\elektronika\555_keisha\breadbordas.jpg"  width="480" style="margin-top: 20px;">
+				<figcaption>図３　ブレッドボード上の傾斜センサー回路</figcaption>
+			</figure>
+		</center>		
+		
+		<p> 
+		SW1がオンのとき、つまり図４に示すように傾斜スイッチがどちらかの方向に90度以上傾いていないと、4番ピン（RESET）に0[V]がかかり、LOWとなる。その結果、NE555タイマーはリセット状態となる。 この状態では、2番ピン（TRIG）がLOWであっても、
+		3番ピン（OUT）に出力されず、電子ブザーは動作しない。 
+		</p> 
+
+		<p> 
+
+		SW1がオフのとき、つまり傾斜スイッチがどちらかの方向に90度以上傾くと、4番ピン（RESET）がHIGHになり、リセット状態が解除される。 また、2番ピン（TRIG）は常にLOWのため、3番ピン（OUT）に出力が発生し、
+		電子ブザーが動作する。SW1がオフのままである限り、ブザーは鳴り続ける。 
+
+		</p>
+		<center>
+			<figure>
+				<img src="C:\Users\kbalc\Desktop\svetaine\elektronika\555_keisha\sw1.png"  width="320" style="margin-top: 20px;">
+				<figcaption>図４　傾斜スイッチの動作原理</figcaption>
+			</figure>
+		</center>	
+
+		
+		
+		</p>
+		
+		
+		
+		
+		
+		
+		
+		
+		<hr class="custom-hr">
+		<strong>考察：</strong>
+
+		<p>
+		本センサーは精密なものではないので、正確な傾きの測定はできないが、ラジコンの小型ボートのような装置には使えるかもしれない。
+		図５、６に示すようなラジコンボートは比較的小型でありながら高速で走行できる。しかし、カーブ時に90度以上傾いて転覆することがある。
+本センサーをボート内部に設置することで、屋内プールでの試走時に傾斜が90度以上になったことをリアルタイムで検知でき、より安定したボートの開発に役立つと考えられる。
+
+また、ボートを水の濁った池や湖で使用する場合、転覆後に水底のどこに衝突したのかを特定するのは難しい。そこで、本センサーを用いることで、ボートが転覆した際に溺れている最中で鳴り続け、
+視界が悪い水中でもボートの位置を把握しやすくなり、ボートの回収が容易になる。
+</p>
+
+		<center>
+			<figure>
+				<img src="C:\Users\kbalc\Desktop\svetaine\elektronika\555_keisha\laivas1.jpg"  width="320" style="margin-top: 20px;">
+				<figcaption>図５　ラジコンボート</figcaption>
+			</figure>
+		</center>	
+		
+				<center>
+			<figure>
+				<img src="C:\Users\kbalc\Desktop\svetaine\elektronika\555_keisha\laivas2.jpg"  width="320" style="margin-top: 20px;">
+				<figcaption>図６　ラジコンボートの内部構造</figcaption>
+			</figure>
+		</center>	
+
+<p>
+本センサーをボートに搭載する前に、回路の調整が必要であると考えられる。センサーの重量は、ボートの動きに影響を与えないように考慮しなければならない。これは、センサーをSMB部品でPCBボード上に作ることで可能であろう。
+また、ボートが動作中に上下運動もするため、傾斜スイッチ内部の玉が跳ね続け、ブザーが断続的にオン・オフを繰り返す可能性がある。その対策として、タイマー（コンデンサ・抵抗やもう一つのNE555チップで構成されたもの）を追加し、
+例えばスイッチが100[ms]以上オフの状態が続いた場合にのみブザーを動作させるようにすることで、不安定な動作を防ぐことができる。
+</p>
+				<hr class="custom-hr">
+		<p>
+		<strong>参考文献：</strong>
+		
+		<p>
+		[1]<a href ="https://ana-dig.com/timer555/#toc3">https://ana-dig.com/timer555/#toc3</a>
+		</p>
+		<p>
+		[2]<a href ="https://www.build-electronic-circuits.com/555-timer/">https://www.build-electronic-circuits.com/555-timer/</a>
+		</p>		
+		<p>
+		[3]<a> Paul Scherz and Simon Monk,Practical Electronics for Inventors 4th Edition, McGraw Hill出版, pp.686-691, (2016).</a>
+		</p>		
+		
+		</p>
+				<div id="menu" align="middle">
+			<a href="C:\Users\kbalc\Desktop\popieriai\kostolab.html">ホームページ</a> |
+            <a href="C:\Users\kbalc\Desktop\popieriai\purog.html">プログラミング系</a> |
+            <a href="C:\Users\kbalc\Desktop\popieriai\denki.html">電気電子系</a>
+        </div>
+		
+		
+		
+</div>
+	
+	
+	</body>
+</html>
